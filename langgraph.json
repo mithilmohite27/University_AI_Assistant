@@ -1,0 +1,68 @@
+{
+    "workflow_name": "University Research Agent",
+    "version": "1.0",
+    "nodes": [
+        {
+            "id": "start",
+            "type": "entry_point",
+            "description": "Initial entry point for university research"
+        },
+        {
+            "id": "web_research",
+            "type": "action",
+            "function": "tavily_search",
+            "description": "Perform web research using Tavily API",
+            "inputs": ["location"],
+            "outputs": ["formatted_results", "sources"]
+        },
+        {
+            "id": "summarize_sources",
+            "type": "transformation",
+            "function": "analyze_and_summarize",
+            "description": "Summarize and analyze web research results",
+            "inputs": ["web_research_results", "previous_summary"],
+            "outputs": ["current_summary"]
+        },
+        {
+            "id": "route_research",
+            "type": "router",
+            "description": "Determine whether to continue research or finalize",
+            "conditions": [
+                {
+                    "condition": "research_loop_count <= max_loops",
+                    "next_node": "web_research"
+                },
+                {
+                    "condition": "research_loop_count > max_loops",
+                    "next_node": "finalize_summary"
+                }
+            ]
+        },
+        {
+            "id": "finalize_summary",
+            "type": "action",
+            "function": "compile_final_report",
+            "description": "Create final research summary with sources",
+            "inputs": ["running_summary", "sources_gathered"],
+            "outputs": ["final_summary"]
+        },
+        {
+            "id": "end",
+            "type": "exit_point",
+            "description": "Workflow completion point"
+        }
+    ],
+    "edges": [
+        {"from": "start", "to": "web_research"},
+        {"from": "web_research", "to": "summarize_sources"},
+        {"from": "summarize_sources", "to": "route_research"},
+        {"from": "route_research", "to": "web_research", "condition": "continue_research"},
+        {"from": "route_research", "to": "finalize_summary", "condition": "max_loops_reached"},
+        {"from": "finalize_summary", "to": "end"}
+    ],
+    "configuration": {
+        "max_research_loops": 3,
+        "default_llm": "llama2",
+        "search_results_per_loop": 3
+    }
+}
