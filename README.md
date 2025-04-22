@@ -76,8 +76,8 @@ The **AI-Powered University Search Agent** is designed to deliver tailored unive
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/university-search-agent.git
-cd university-search-agent
+git clone https://github.com/mithilmohite27/University_AI_Assistant.git
+cd University_AI_Assistant
 
 2. Install Requirements
 bash
